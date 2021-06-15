@@ -1,0 +1,78 @@
+######################################
+    G U I D E
+######################################
+
+<>  - comment
+[]  - optional
+()  - group
+abc - piece
++   - one or more in series
+..  - repeating pattern
+
+piece     group                       comment                                              optional comment
+\/        \/                          \/                                                   \/
+literal = (<hex prefix + hex number> | <binary prefix + binary number> | <decimal number>) [type suffix]
+
+######################################
+
+type = ['*'+] [<type name> | '[' type ',' type ',' type ',' .. ']'] <size multiplier> <pointer level>
+
+// Misc.
+name (regex) = [a-zA-Z_][a-zA-Z0-9_]*
+
+// Factor
+variableAccess = ['*'+ | '&'] name [((('.' variableAccess) | ('-'+ '>' variableAccess)) name)+]
+literal = (<hex prefix + hex number> | <binary prefix + binary number> | <decimal number>) [type suffix]
+call = target '(' type name ',' type name ',' type name ',' .. ')'
+factor = literal | variableAccess | call
+
+// Arithmetic operations
+bitwise = factor   &/|/^/>>/<<   factor   &/|/^/>>/<<   factor   &/|/^/>>/<<   .. 
+addAndSub = bitwise +/- bitwise +/- bitwise +/- .. 
+mulAndDiv = addAndSub +/- addAndSub +/- addAndSub +/- .. 
+
+// Logical expressions
+valueComparison = mulAndDiv >/</==/!=/=</=> mulAndDiv >/</==/!=/=</=> mulAndDiv >/</==/!=/=</=> ..
+comparison = valueComparison &&/||/^^ valueComparison &&/||/^^ valueComparison &&/||/^^ ..
+
+// Statements
+variableAssignment = target '=' comparison
+variableDefinition = type name [ '=' comparison ]
+
+return = 'return' mulAndDiv
+continue = 'continue' name
+break = 'break' name
+join = 'join' name
+
+if = 'if' '(' comparison ')' '{' statement ';' statement ';' statement ';' .. '}' [ 'else' statement ]
+while = 'while' '(' comparison ')' '{' statement ';' statement ';' statement ';' .. '}'
+doWhile = 'do' '{' statement ';' statement ';' statement ';' .. '}' 'while' '(' comparison ')'
+for = 'for' '(' statement ';' comparison ';' statement ')' '{' statement ';' statement ';' statement ';' .. '}'
+
+statement = definition | assignment | mulAndDiv | comparison | return | continue | break | section | if | while | doWhile | for
+
+// Definitions
+function = 'function' type name '(' type name ',' type name ',' type name ',' .. ')' '{' statement ';' statement ';' statement ';' .. '}'
+section = 'section' name '{' statement ';' statement ';' statement ';' .. '}'
+staticVariable = 'static' type name [ '=' mulAndDiv ]
+
+definition = function | section | staticVariable
+
+
+######################################
+    CALL ORDER
+######################################
+
+comparison
+valueComparison
+mulAndDiv
+addAndSub
+bitwise
+
+bitwise > addAndSub > mulAndDiv > valueComparison > comparison
+
+function Operation() {
+    while(in->c is accepted symbol) {
+        return BinaryOperation(left, operation, right);
+    }
+}

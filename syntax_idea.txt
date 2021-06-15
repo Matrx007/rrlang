@@ -1,0 +1,121 @@
+
+// #######################
+// # $STD/String.rr      #
+// #######################
+
+#include "$STD/Memory.rr.h"
+#include "$STD/Heap.rr.h"
+
+/*
+	# Contains meta-info of a string.
+	
+	- `data` must end with a null-terminator
+	- `data` could be 0 in certain conditions
+	
+	To manipulate strings, use the functions inside the `Strings` namespace.
+*/
+type String {
+	// @readonly = write locally, access globally
+	// @const 	 = initialize locally, access globally
+	length: ui32 @readonly;
+	data: 	ui8*;
+	
+	fn constructor(chars: const ui8*) {
+		if(chars == 0) {
+			data = 0;
+			length = 0;	
+			return;
+		}
+		
+		data = String.heapify(chars);
+		length = Strings.chars(data);
+	}
+	
+	/*
+		# Releases the resources in heap used by this string.
+	*/
+	fn free() {
+		free(data);
+		data = 0;
+		length = 0;
+	}
+	
+	
+	/*
+		# This String will be copied into a new instance in heap.
+		
+		- Might return 0 if allocating new heap space failed
+	*/
+	fn heapify(): ui8* {
+		let heapSpace: ui8* = Heap.allocate(length);
+		
+		if(heapSpace == 0) return 0;
+		
+		Memory.copy(dest: heapSpace, src: data, n: length);
+		
+		return heapSpace;
+	}
+	
+	
+	/*
+		# Re-calculates the length of the String. Use only if the `data` pointer has been changed.
+		
+		- Will return 0 if `data` pointer is 0
+	*/
+	fn length(): ui32 {
+		length = 0;
+		
+		if(length == 0) return 0;
+		
+		let p: ui8* = data;
+		while(*p != 0) {
+			length++;
+		}
+		length++;
+		
+		return length;
+	}
+};
+
+/*
+	
+	# Contains functions to manipulate a String, multiple String-s or a charcter array (aka ui8*).
+	
+*/
+namespace Strings {
+	
+	fn chars(str: ui8*) {
+		let length: ui32 = 0;
+		
+		while(*str != 0) {
+			length++;
+		}
+		length++;
+		
+		return length;
+	}
+	
+}
+
+
+// #######################
+// # src/Demo.rr         #
+// #######################
+
+#include "$STD/Strings.rr.h"
+#include "$STD/IO.rr.h"
+
+enum Gender {
+	Male,
+	Female,
+	AttackHelicopter
+};
+
+type Person {
+	name: String;
+	gender: Gender;
+};
+
+let person: Person = Person{ String("John Doe"), Gender.Male };
+
+printf("%s's name is %d characters long\n", person.name, person.name.length);

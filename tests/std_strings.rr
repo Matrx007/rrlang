@@ -1,0 +1,28 @@
+fn strLength(string: u8*): u32 {
+    let length = 0: u32;
+    while(*string != 0) {
+        length++;
+        string++;
+    };
+    return length;
+};
+
+fn charToInteger(char: u8): u8 {
+    if(char < '0') {
+        return 0xFF;
+    };
+    char -= '0';
+    if(char > 9) {
+        return 0xFF;
+    };
+    return char;
+};
+
+fn strToInteger(string: u8*): u32 {
+    let integer = 0: u32;
+    while(*string != 0) {
+        integer *= 10;
+        integer += charToInteger(*string);
+    };
+    return integer;
+};

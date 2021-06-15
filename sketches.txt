@@ -1,0 +1,58 @@
+1+7*(5<4)+(4*9&2)
+
+
+comparison
+valueComparison
+mulAndDiv
+addAndSub
+bitwise
+
+
+fn parseMulAndDiv(EatableString* in, Node* left): Node* {
+    Node* result = left;
+    while(in.c == '*' || in.c == '/') {
+        in->nextChar();
+        left = (new Node("binaryOperator"))
+                    ..append("operation", in.c)
+                    ..append("left", result)
+                    ..append("right", parseFactor());
+    }
+}
+
+fn parseAddAndSub(EatableString* in, Node* left): Node* {
+    Node* result = left;
+    while(in.c == '+' || in.c == '-') {
+        in->nextChar();
+        left = (new Node("binaryOperator"))
+                    ..append("operation", in.c)
+                    ..append("left", result)
+                    ..append("right", parseMulAndDiv());
+    }
+}
+
+fn parseBitwise(EatableString* in, Node* left): Node* {
+    Node* result = left;
+    while(in.c == '&' || in.c == '|' || in.c == '^') {
+        in->nextChar();
+        left = (new Node("binaryOperator"))
+                    ..append("operation", in.c)
+                    ..append("left", result)
+                    ..append("right", parseAddAndSub());
+    }
+}
+
+
+
+
+
+struct B {
+    u32 x;
+};
+struct A {
+    struct B ***b;
+};
+struct C {
+    struct A **a;
+} cc;
+
+u32 r = cc.a-->b--->x;

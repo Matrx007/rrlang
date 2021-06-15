@@ -1,0 +1,9 @@
+# Project specific stuff
+parser
+
+# C specific stuff
+core
+
+# VS Code specific stuff
+.vscode/
+.VSCodeCounter/
